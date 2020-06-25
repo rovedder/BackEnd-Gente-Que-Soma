@@ -165,6 +165,7 @@ namespace TrabBackEndFinal.Telas
                     Caixa.SacarNotas(2, quantidadeNotasDois);
 
                     Escrever("Saque efetuado com sucesso!");
+                    Escrever($"50 - {quantidadeNotasCinquenta} | 20 - {quantidadeNotasVinte} | 10 - {quantidadeNotasDez} | 5 - {quantidadeNotasCinco} | 2 - {quantidadeNotasDois}");
                     AguardarTecla("Aperte qualquer tecla para voltar");
                     return;
                 }
