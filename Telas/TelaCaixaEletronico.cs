@@ -4,7 +4,7 @@ namespace TrabBackEndFinal.Telas
 {
     public class TelaCaixaEletronico : TelaBase
     {
-        protected CaixaEletronico Caixa = new CaixaEletronico();
+        private CaixaEletronico Caixa = new CaixaEletronico();
 
         /// <summary>
         /// Executa a tela principal do caixa eletronico
@@ -93,17 +93,17 @@ namespace TrabBackEndFinal.Telas
 
             valor = EscreverLerInt("Informe o valor que deseja sacar - 0 para voltar");
 
-            if(valor == 0)
+            if (valor == 0)
             {
                 return;
             }
-            else if(valor < 0) 
+            else if (valor < 0) 
             {
                 Escrever("Valor invalido.");
                 AguardarTecla("Aperte qualque tecla para voltar.");
                 return;
             }
-            else if(valor > Caixa.RetornarSaldo()) 
+            else if (valor > Caixa.RetornarSaldo()) 
             {
                 Escrever("Saldo insuficiente.");
                 AguardarTecla("Aperte qualque tecla para voltar.");
@@ -111,46 +111,66 @@ namespace TrabBackEndFinal.Telas
             }
             else 
             {
-
-                int valorAux = valor;
-
                 int quantidadeNotasCinquenta = default(int);
                 int quantidadeNotasVinte = default(int);
                 int quantidadeNotasDez = default(int);
                 int quantidadeNotasCinco = default(int);
                 int quantidadeNotasDois = default(int);
 
-                if(Caixa.NotaCinquenta != 0) 
+                while(valor > 1)
                 {
-                    quantidadeNotasCinquenta = (valorAux / 50);
-                    valorAux -= quantidadeNotasCinquenta * 50;
+                    // São realizadas as seguintes verificações:
+                    // 1 - Quantidade de notas maior que 0
+                    // 2 - Quantidade de notas a ser sacada menor que quantidade de notas disponiveis
+                    // 3 - Valor deve ser maior que o valor da Nota
+                    if (Caixa.NotaCinquenta > 0 && 
+                        quantidadeNotasCinquenta < Caixa.NotaCinquenta &&
+                        valor >= 50
+                        )
+                    {
+                        quantidadeNotasCinquenta++;
+                        valor -= 50;
+                    }
+                    else if(Caixa.NotaVinte > 0 && 
+                            quantidadeNotasVinte < Caixa.NotaVinte &&
+                            valor >= 20)
+                    {
+                        quantidadeNotasVinte++;
+                        valor -= 20;
+                    }
+                    else if(Caixa.NotaDez > 0 && 
+                            quantidadeNotasDez < Caixa.NotaDez &&
+                            valor >= 10)
+                    {
+                        quantidadeNotasDez++;
+                        valor -= 10;
+                    }
+                    // O resto do valor dividido por 5 não pode ser impar
+                    // Senão buga em casos como 58 (1 nota- 50 / 1 nota- 5 / 4 notas- 2)
+                    else if(Caixa.NotaCinco > 0 && 
+                            quantidadeNotasCinco < Caixa.NotaCinco &&
+                            (valor % 5) % 2 == 0 &&
+                            valor >= 5)
+                    {
+                        quantidadeNotasCinco++;
+                        valor -= 5;
+                    }
+                    else if(Caixa.NotaDois > 0 && 
+                            quantidadeNotasDois < Caixa.NotaDois &&
+                            valor >= 2)
+                    {
+                        quantidadeNotasDois++;
+                        valor -= 2;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-                
-                if(Caixa.NotaVinte != 0) 
-                {
-                    quantidadeNotasVinte = (valorAux / 20);
-                    valorAux -= quantidadeNotasVinte * 20;
-                }
-                
-                if(Caixa.NotaDez != 0) 
-                {
-                    quantidadeNotasDez = (valorAux / 10);
-                    valorAux -= quantidadeNotasDez * 10;
-                }
-                
-                if(Caixa.NotaCinco != 0)
-                {
-                    quantidadeNotasCinco = (valorAux / 5);
-                    valorAux -= quantidadeNotasCinco * 5;
-                }
-                
-                if(Caixa.NotaDois != 0)
-                {
-                    quantidadeNotasDois = (valorAux / 2);
-                    valorAux -= quantidadeNotasDois * 2;
-                }
-
-                if(valorAux != 0)
+               
+               // Se no final o valor ainda for maior (unica opção é ser 1)
+               // Operação não pode ser efetuada
+                if (valor != 0)
                 {
                     Escrever("Operacao nao pode ser efetuada.");
                     AguardarTecla("Aperte qualquer tecla para voltar.");
@@ -158,11 +178,12 @@ namespace TrabBackEndFinal.Telas
                 }
                 else
                 {
-                    Caixa.SacarNotas(50, quantidadeNotasCinquenta);
-                    Caixa.SacarNotas(20, quantidadeNotasVinte);
-                    Caixa.SacarNotas(10, quantidadeNotasDez);
-                    Caixa.SacarNotas(5, quantidadeNotasCinco);
-                    Caixa.SacarNotas(2, quantidadeNotasDois);
+                    // Efetiva o saque com as quantidades pré definidas
+                    Caixa.SacarNota(50, quantidadeNotasCinquenta);
+                    Caixa.SacarNota(20, quantidadeNotasVinte);
+                    Caixa.SacarNota(10, quantidadeNotasDez);
+                    Caixa.SacarNota(5, quantidadeNotasCinco);
+                    Caixa.SacarNota(2, quantidadeNotasDois);
 
                     Escrever("Saque efetuado com sucesso!");
                     Escrever($"50 - {quantidadeNotasCinquenta} | 20 - {quantidadeNotasVinte} | 10 - {quantidadeNotasDez} | 5 - {quantidadeNotasCinco} | 2 - {quantidadeNotasDois}");
